@@ -139,6 +139,8 @@ textarea {
 
 .btn {
   display: inline-flex;
+  white-space: nowrap;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
   gap: 7px;
@@ -466,8 +468,20 @@ textarea {
 .prose {
   font-size: 13.5px;
   line-height: 1.8;
-  white-space: pre-wrap;
   word-break: break-word;
+}
+
+.prose p {
+  margin: 0 0 6px;
+}
+
+.prose ul {
+  margin: 4px 0 10px;
+  padding-left: 18px;
+}
+
+.prose li {
+  margin-bottom: 3px;
 }
 
 .prose h2 {

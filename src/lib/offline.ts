@@ -19,10 +19,16 @@ function sentences(text: string): string[] {
     .filter(Boolean);
 }
 
-function collect(segments: Session["segments"], pattern: RegExp, limit: number): string[] {
+function collect(
+  segments: Session["segments"],
+  pattern: RegExp,
+  limit: number,
+  exclude?: Set<string>,
+): string[] {
   const hits: string[] = [];
   for (const seg of segments) {
     for (const s of sentences(seg.text)) {
+      if (exclude?.has(s.trim())) continue;
       if (pattern.test(s)) {
         hits.push(`- ${s}（[${formatTimestamp(seg.t)}]）`);
         if (hits.length >= limit) return hits;
@@ -34,9 +40,11 @@ function collect(segments: Session["segments"], pattern: RegExp, limit: number):
 
 export function offlineSummary(session: Session): string {
   const head = session.segments[0]?.text ?? session.title;
-  const decisions = collect(session.segments, DECISION, 4);
-  const todos = collect(session.segments, TODO, 6);
-  const risks = collect(session.segments, RISK, 4);
+  // 第一句已经用作「一句话结论」，别在其它小节重复出现
+  const used = new Set([head.trim()]);
+  const decisions = collect(session.segments, DECISION, 4, used);
+  const todos = collect(session.segments, TODO, 6, used);
+  const risks = collect(session.segments, RISK, 4, used);
   const block = (title: string, items: string[]) =>
     `## ${title}\n${items.length ? items.join("\n") : "无"}\n`;
 
